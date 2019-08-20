@@ -1,3 +1,4 @@
+// Modal component
 Vue.component('edit-tag', {
     props: ['todo'],
     template: '#editTagForm',
@@ -5,6 +6,7 @@ Vue.component('edit-tag', {
         editTag(e) {
             e.preventDefault();
 
+            // 呼叫 axios
             sendRequest("put", app.todoUrl, this.todo, () => {
                 // 成功後執行 ...
 
@@ -62,8 +64,10 @@ Vue.component('create-tag', {
 
 Vue.component('Modal', {
     template: '#modalTemplate'
-})
+});
+// Modal component end
 
+// Todo list component
 Vue.component('todo-item', {
     props: ['todo'],
     template: '#todoItem',
@@ -74,11 +78,13 @@ Vue.component('todo-item', {
 
             let removeIndex = app.todos.indexOf(this.todo);
 
+            // 移除畫面上的元素
             app.todos.splice(removeIndex, 1);
 
         },
         edit() {
 
+            // 同步表單上的資料
             app.todo.id = this.todo.id;
             app.todo.title = this.todo.title;
             app.todo.end_time = this.todo.end_time;
@@ -92,12 +98,14 @@ Vue.component('todo-list', {
     props: ['todos'],
     template: '#todoList',
 });
+// Todo list component end
 
 
 let app = new Vue({
     el: '#app',
     data: {
         todoUrl: "/todos",
+        // Modal controller
         showCreateForm: false,
         showEditForm: false,
         todos: [
@@ -105,17 +113,16 @@ let app = new Vue({
             { id: 2, title: 'Line 2', end_time: '2019-08-20' },
             { id: 3, title: 'Line 3', end_time: '2019-08-20' },
         ],
-        // 接收子組件的資料並傳給另一個組件
+        // 接收元件的資料並傳給另一個元件
         todo: { id: 0, title: '', end_time: '' }
     },
     mounted() {
-        axios.get('/todos')
-            .then(res => {
-                this.todos = res.data;
-            })
-            .catch(err => {
-                console.log(err);
-            });
+
+        // 從 server 更新 todo list 資料
+        sendRequest("get", this.todoUrl, '', res => {
+            this.todos = res.data;
+        });
+
     },
     methods: {
         createFormModal() {
@@ -130,10 +137,22 @@ let app = new Vue({
 
 /**
  *  Axios 整合包!
+ *  
+ *  @param string method ["get", "post", "put", "delete"]
+ * 
+ *  @param string url
+ * 
+ *  @param any data { key: "value"}
+ * 
+ *  @param string contentType 設定請求內容格式
+ * 
+ *  @param function whenSuccess 當接收到成功回應時使用的回呼函數
+ *
+ *  @param function whenError 錯誤回應時使用的回呼函數
+ * 
  */
-
 function sendRequest(
-    method, url, data, whenSuccess,
+    method = "", url = "", data, whenSuccess,
     contentType = "application/json", whenError
 ) {
     switch (contentType.toLowerCase()) {
@@ -141,6 +160,9 @@ function sendRequest(
             data = JSON.stringify(data);
             break;
         default:
+            // 轉換成 url-encoded 格式
+            contentType = "application/x-www-form-urlencoded";
+            data = Object.keys(data).map(key => key + '=' + data[key]).join('&');
             break;
     }
 

@@ -58,9 +58,8 @@
 
         <!-- Create Tag Modal -->
         <transition enter-active-class="animated rollIn" leave-active-class="animated rollOut">
-            <Modal v-if="showCreateForm">
+            <Modal v-if="showCreateForm" @close="createFormModal">
                 <template #header>
-                    <button @click="createFormModal" class="close">&times;</button>
                     <h3>Create a Tag</h3>
                 </template>
                 <template #body>
@@ -71,9 +70,8 @@
 
         <!-- Edit Tag Modal -->
         <transition enter-active-class="animated zoomIn" leave-active-class="animated zoomOut">
-            <Modal v-if="showEditForm">
+            <Modal v-if="showEditForm" @close="editFormModal">
                 <template #header>
-                    <button @click="editFormModal" class="close">&times;</button>
                     <h3>Edit a Tag</h3>
                 </template>
                 <template #body>
@@ -83,6 +81,8 @@
         </transition>
     </div>
 
+    <!-- Modal component -->
+    <!-- 編輯內容 -->
     <script type="text/x-template" id="editTagForm">
         <form action="" @submit='editTag'>
             <div class="input-group">
@@ -104,6 +104,7 @@
         </form>
     </script>
 
+    <!-- 新增 -->
     <script type="text/x-template" id="createTagForm">
         <form action="" @submit='createTag'>
             <div class="input-group">
@@ -125,12 +126,14 @@
         </form>
     </script>
 
+    <!-- Modal 基底 -->
     <script type="text/x-template" id="modalTemplate">
         <div class="modal-mask">
             <div class="modal-wrapper">
                 <div class="modal-container">
 
                     <div class="modal-header">
+                        <button @click="$emit('close')" class="close">&times;</button>
                         <slot name='header'></slot>
                     </div>
 
@@ -144,7 +147,9 @@
             </div>
         </div>
     </script>
+    <!-- Modal component end -->
 
+    <!-- Todo list component -->
     <script type="text/x-template" id='todoItem'>
         <transition enter-active-class="animated heartBeat" leave-active-class="leave-doc animated hinge" mode="out-in" appear>
         <a href="#" class="list-group-item">
@@ -168,6 +173,7 @@
             <todo-item v-for=' todo in todos' :todo='todo' :key='todo.id'></todo-item>
         </div>
     </script>
+    <!-- Todo list component end -->
 
     <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.min.js'></script>
     <script src='https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.min.js'></script>
