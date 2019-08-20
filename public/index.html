@@ -1,0 +1,177 @@
+<!-- 
+
+    - 如何在載入頁面的時候不啟動動畫，但是每次新增都會啟動 ？
+    - Component 怎麼使用 transition group ？
+
+ -->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+
+    <link rel='stylesheet'
+        href='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css' />
+    <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.2/animate.min.css' />
+
+    <!-- custom css -->
+    <link rel="stylesheet" href="css/style.css">
+
+
+</head>
+
+<body>
+
+    <div id="app" class="container">
+        <br><br>
+        <div class="row">
+            <div class="col-md-8 col-md-offset-2">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <div class="row">
+                            <div class="col-md-8 col-md-offset-2 text-center">
+                                <h3>
+                                    Todo List
+                                </h3>
+                            </div>
+                            <div class="col-md-2">
+                                <button @click="createFormModal" class="btn btn-default new-tag-btn">
+                                    <i class="glyphicon glyphicon-tag"></i>
+                                    <span>New Tag</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- display todo list -->
+                    <div class="panel-body">
+                        <todo-list :todos='todos'></todo-list>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- Create Tag Modal -->
+        <transition enter-active-class="animated rollIn" leave-active-class="animated rollOut">
+            <Modal v-if="showCreateForm">
+                <template #header>
+                    <button @click="createFormModal" class="close">&times;</button>
+                    <h3>Create a Tag</h3>
+                </template>
+                <template #body>
+                    <create-tag></create-tag>
+                </template>
+            </Modal>
+        </transition>
+
+        <!-- Edit Tag Modal -->
+        <transition enter-active-class="animated zoomIn" leave-active-class="animated zoomOut">
+            <Modal v-if="showEditForm">
+                <template #header>
+                    <button @click="editFormModal" class="close">&times;</button>
+                    <h3>Edit a Tag</h3>
+                </template>
+                <template #body>
+                    <edit-tag :todo='todo'></edit-tag>
+                </template>
+            </Modal>
+        </transition>
+    </div>
+
+    <script type="text/x-template" id="editTagForm">
+        <form action="" @submit='editTag'>
+            <div class="input-group">
+                <span class="input-group-addon">
+                    <i class="glyphicon glyphicon-pencil"></i>
+                </span>
+                <input v-model="todo.title" type="text" class="form-control" placeholder="do something...">
+            </div>
+            <br>
+            <div class="input-group">
+                <span class="input-group-addon">
+                    <i class="glyphicon glyphicon-flag"></i>
+                </span>
+                <input v-model="todo.end_time" type="date" class="form-control">
+            </div>
+            <br>
+            <button type="reset" class="btn btn-secondary">Reset</button>
+            <button type="submit" class="btn btn-success pull-right">Post</button>
+        </form>
+    </script>
+
+    <script type="text/x-template" id="createTagForm">
+        <form action="" @submit='createTag'>
+            <div class="input-group">
+                <span class="input-group-addon">
+                    <i class="glyphicon glyphicon-pencil"></i>
+                </span>
+                <input v-model="todo.title" type="text" class="form-control" placeholder="do something...">
+            </div>
+            <br>
+            <div class="input-group">
+                <span class="input-group-addon">
+                    <i class="glyphicon glyphicon-flag"></i>
+                </span>
+                <input v-model="todo.end_time" type="date" class="form-control">
+            </div>
+            <br>
+            <button type="reset" class="btn btn-secondary">Reset</button>
+            <button type="submit" class="btn btn-success pull-right">Post</button>
+        </form>
+    </script>
+
+    <script type="text/x-template" id="modalTemplate">
+        <div class="modal-mask">
+            <div class="modal-wrapper">
+                <div class="modal-container">
+
+                    <div class="modal-header">
+                        <slot name='header'></slot>
+                    </div>
+
+                    <div class="modal-body">
+                        <slot name="body"></slot>
+                    </div>
+
+                    <div class="modal-footer">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </script>
+
+    <script type="text/x-template" id='todoItem'>
+        <transition enter-active-class="animated heartBeat" leave-active-class="leave-doc animated hinge" mode="out-in" appear>
+        <a href="#" class="list-group-item">
+            <div class="row">
+                <div @click='edit' class="col-md-8">
+                    <span>{{ todo.title }}</span>
+                </div>
+                <div @click='edit' class="col-md-3">
+                    <i class="blockquote-footer">{{ todo.end_time }}</i>
+                </div>
+                <div class="col-md-1">
+                    <button @click="remove" class="close">&times;</button>
+                </div>
+            </div>
+        </a>
+        </transition>
+    </script>
+
+    <script type="text/x-template" id="todoList">
+        <div class="list-group">
+            <todo-item v-for=' todo in todos' :todo='todo' :key='todo.id'></todo-item>
+        </div>
+    </script>
+
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.min.js'></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.min.js'></script>
+    <script src="js/main.js"></script>
+</body>
+
+</html>
